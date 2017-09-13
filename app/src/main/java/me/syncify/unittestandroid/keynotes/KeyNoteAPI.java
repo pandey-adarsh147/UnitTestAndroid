@@ -1,5 +1,8 @@
 package me.syncify.unittestandroid.keynotes;
 
+import java.util.List;
+
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 
 /**
@@ -9,5 +12,9 @@ import retrofit2.http.POST;
 public interface KeyNoteAPI {
 
     @POST("/submit/keynote")
-    void addKeyNotes(KeyNote keyNote);
+    boolean addKeyNote(KeyNote keyNote);
+
+    @GET("keynotes/all")
+    List<KeyNote> getAllKeyNotes();
+
 }

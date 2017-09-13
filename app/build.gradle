@@ -43,6 +43,7 @@ dependencies {
 
 
     testCompile "org.assertj:assertj-core:3.8.0"
+    testCompile 'org.hamcrest:hamcrest-library:1.1'
 
     // robolectric
     testCompile "org.robolectric:robolectric:3.4.2"
