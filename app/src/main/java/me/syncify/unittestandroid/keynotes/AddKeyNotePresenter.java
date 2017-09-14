@@ -15,7 +15,7 @@ public class AddKeyNotePresenter implements AddKeyNoteProtocol.Presenter {
     @Inject
     public KeyNoteAPI keyNoteAPI;
 
-    AddKeyNotePresenter(AddKeyNoteProtocol.View view, KeyNoteAPI keyNoteAPI) {
+    public AddKeyNotePresenter(AddKeyNoteProtocol.View view, KeyNoteAPI keyNoteAPI) {
         this.view = view;
         this.keyNoteAPI = keyNoteAPI;
     }
@@ -38,10 +38,21 @@ public class AddKeyNotePresenter implements AddKeyNoteProtocol.Presenter {
     }
 
     @Override
-    public List<KeyNote> getAllNotes() {
-        return null;
+    public void getAllNotes() {
+        view.showLoader();
+        List<KeyNote> keyNoteList = handleGetNoteApi();
+        if(keyNoteList != null && keyNoteList.size() > 0){
+            view.showNoteList(keyNoteList);
+        } else {
+            view.showEmptyList();
+        }
+        view.hideLoader();
     }
 
+    @Override
+    public List<KeyNote> handleGetNoteApi() {
+        return keyNoteAPI.getKeyNotes();
+    }
 
 
 }

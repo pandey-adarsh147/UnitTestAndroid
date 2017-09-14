@@ -2,13 +2,12 @@ package me.syncify.unittestandroid.keynotes;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -29,7 +28,7 @@ public class AddKeyNotePresenterTest {
 
 
     @Test
-    public void testAddKeyNotes() {
+    public void testAddKeyNotesBasic() {
         AddKeyNoteProtocol.Presenter presenter = new AddKeyNotePresenter(view, keyNoteAPI);
 
         KeyNote keyNote = new KeyNote();
@@ -37,6 +36,7 @@ public class AddKeyNotePresenterTest {
 
         verify(view).showLoader();
         verify(keyNoteAPI).addKeyNotes(keyNote);
+        verify(view).hideLoader();
     }
 
     @Test
@@ -59,6 +59,71 @@ public class AddKeyNotePresenterTest {
         presenter.addNotes(keyNote);
 
         verify(view).showError();
+    }
+
+    @Test
+    public void testGetKeyNotesBasic() {
+        AddKeyNoteProtocol.Presenter presenter = new AddKeyNotePresenter(view, keyNoteAPI);
+
+        presenter.getAllNotes();
+
+        verify(view).showLoader();
+        verify(keyNoteAPI).getKeyNotes();
+        verify(view).hideLoader();
+    }
+
+    @Test
+    public void testGetKeyNotesWithData() {
+        AddKeyNoteProtocol.Presenter presenter = new AddKeyNotePresenter(view, keyNoteAPI);
+
+        List<KeyNote> keyNoteList = getKeyNoteList();
+        when(presenter.handleGetNoteApi()).thenReturn(keyNoteList);
+        presenter.getAllNotes();
+
+        verify(view).showNoteList(keyNoteList);
+    }
+
+    @Test
+    public void testGetKeyNotesWithNullData() {
+        AddKeyNoteProtocol.Presenter presenter = new AddKeyNotePresenter(view, keyNoteAPI);
+
+        when(presenter.handleGetNoteApi()).thenReturn(null);
+        presenter.getAllNotes();
+
+        verify(view).showEmptyList();
+    }
+
+    @Test
+    public void testGetKeyNotesWithEmptyData() {
+        AddKeyNoteProtocol.Presenter presenter = new AddKeyNotePresenter(view, keyNoteAPI);
+
+        when(presenter.handleGetNoteApi()).thenReturn(new ArrayList<>());
+        presenter.getAllNotes();
+
+        verify(view).showEmptyList();
+    }
+
+    private List<KeyNote> getKeyNoteList() {
+        List<KeyNote> keyNoteList = new ArrayList<>();
+        KeyNote keyNote = new KeyNote();
+        keyNote.title = "Key Note 1";
+        keyNoteList.add(keyNote);
+        keyNote = new KeyNote();
+        keyNote.title = "Key Note 2";
+        keyNoteList.add(keyNote);
+        keyNote = new KeyNote();
+        keyNote.title = "Key Note 3";
+        keyNoteList.add(keyNote);
+        keyNote = new KeyNote();
+        keyNote.title = "Key Note 4";
+        keyNoteList.add(keyNote);
+        keyNote = new KeyNote();
+        keyNote.title = "Key Note 5";
+        keyNoteList.add(keyNote);
+        keyNote = new KeyNote();
+        keyNote.title = "Key Note 6";
+        keyNoteList.add(keyNote);
+        return keyNoteList;
     }
 
 }

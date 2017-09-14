@@ -33,24 +33,18 @@ retrolambda {
 
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.3.1'
     testCompile 'junit:junit:4.12'
-
-
-    testCompile "org.assertj:assertj-core:3.8.0"
-
+    testCompile 'org.assertj:assertj-core:3.8.0'
     // robolectric
-    testCompile "org.robolectric:robolectric:3.4.2"
-    testCompile "org.robolectric:shadows-support-v4:3.4-rc2"
-
+    testCompile 'org.robolectric:robolectric:3.4.2'
+    testCompile 'org.robolectric:shadows-support-v4:3.4-rc2'
     compile 'io.reactivex:rxjava:1.1.5'
     compile 'io.reactivex:rxandroid:1.2.0'
-
     // Rx
     compile 'io.reactivex:rxandroid:1.1.0'
     compile 'io.reactivex:rxjava:1.1.0'
@@ -65,10 +59,10 @@ dependencies {
     compile 'com.pushtorefresh.storio:sqlite:1.8.0'
     // RxBinding
     compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
-
     compile 'com.squareup.retrofit2:retrofit:2.0.2'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.0.2'
     compile 'com.squareup.retrofit2:converter-gson:2.0.2'
     compile 'com.squareup.retrofit2:retrofit-mock:2.0.2'
-
+    compile 'com.jakewharton.rxbinding:rxbinding-recyclerview-v7:0.3.0'
+    compile 'com.android.support:recyclerview-v7:25.0.0'
 }
