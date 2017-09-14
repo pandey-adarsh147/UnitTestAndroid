@@ -11,6 +11,7 @@ import org.mockito.junit.MockitoRule;
 import javax.inject.Inject;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by adarshpandey on 9/12/17.
@@ -36,6 +37,28 @@ public class AddKeyNotePresenterTest {
 
         verify(view).showLoader();
         verify(keyNoteAPI).addKeyNotes(keyNote);
+    }
+
+    @Test
+    public void testAddKeyNotesSuccess() {
+        AddKeyNoteProtocol.Presenter presenter = new AddKeyNotePresenter(view, keyNoteAPI);
+
+        KeyNote keyNote = new KeyNote();
+        when(presenter.handleAddNoteApi(keyNote)).thenReturn(new KeyNote());
+        presenter.addNotes(keyNote);
+
+        verify(view).showSuccess();
+    }
+
+    @Test
+    public void testAddKeyNotesFailure() {
+        AddKeyNoteProtocol.Presenter presenter = new AddKeyNotePresenter(view, keyNoteAPI);
+
+        KeyNote keyNote = new KeyNote();
+        when(presenter.handleAddNoteApi(keyNote)).thenReturn(null);
+        presenter.addNotes(keyNote);
+
+        verify(view).showError();
     }
 
 }

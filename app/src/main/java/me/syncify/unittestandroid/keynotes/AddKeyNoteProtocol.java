@@ -16,6 +16,7 @@ public class AddKeyNoteProtocol {
 
     public interface Presenter {
         void addNotes(KeyNote keyNote);
+        KeyNote handleAddNoteApi(KeyNote keyNote);
         List<KeyNote> getAllNotes();
     }
 }

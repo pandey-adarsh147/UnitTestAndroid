@@ -10,12 +10,12 @@ import javax.inject.Inject;
 
 public class AddKeyNotePresenter implements AddKeyNoteProtocol.Presenter {
 
-    AddKeyNoteProtocol.View view;
+    private AddKeyNoteProtocol.View view;
 
     @Inject
-    KeyNoteAPI keyNoteAPI;
+    public KeyNoteAPI keyNoteAPI;
 
-    public AddKeyNotePresenter(AddKeyNoteProtocol.View view, KeyNoteAPI keyNoteAPI) {
+    AddKeyNotePresenter(AddKeyNoteProtocol.View view, KeyNoteAPI keyNoteAPI) {
         this.view = view;
         this.keyNoteAPI = keyNoteAPI;
     }
@@ -23,7 +23,18 @@ public class AddKeyNotePresenter implements AddKeyNoteProtocol.Presenter {
     @Override
     public void addNotes(KeyNote keyNote) {
         view.showLoader();
-        keyNoteAPI.addKeyNotes(keyNote);
+        KeyNote finalKeyNote = handleAddNoteApi(keyNote);
+        view.hideLoader();
+        if(finalKeyNote != null){
+            view.showSuccess();
+        } else {
+            view.showError();
+        }
+    }
+
+    @Override
+    public KeyNote handleAddNoteApi(KeyNote keyNote) {
+        return keyNoteAPI.addKeyNotes(keyNote);
     }
 
     @Override

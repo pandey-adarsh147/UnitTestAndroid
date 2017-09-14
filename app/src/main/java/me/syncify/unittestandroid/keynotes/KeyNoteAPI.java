@@ -9,5 +9,5 @@ import retrofit2.http.POST;
 public interface KeyNoteAPI {
 
     @POST("/submit/keynote")
-    void addKeyNotes(KeyNote keyNote);
+    KeyNote addKeyNotes(KeyNote keyNote);
 }
