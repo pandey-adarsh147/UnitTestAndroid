@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">UnitTestAndroid</string>
     <string name="title_activity_note">NoteActivity</string>
+    <string name="title">Title</string>
+    <string name="add_note">Add Note</string>
+    <string name="description">Description</string>
+    <string name="get_notes">Get Notes</string>
+    <string name="loading">Loading</string>
+    <string name="successfully_added_note">Successfully Added Note</string>
+    <string name="cannot_add_note">Cannot Add Note</string>
 </resources>

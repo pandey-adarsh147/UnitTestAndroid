@@ -14,7 +14,7 @@ public interface KeyNoteAPI {
     @POST("/submit/keynote")
     boolean addKeyNote(KeyNote keyNote);
 
-    @GET("keynotes/all")
+    @GET("/keynotes/all")
     List<KeyNote> getAllKeyNotes();
 
 }

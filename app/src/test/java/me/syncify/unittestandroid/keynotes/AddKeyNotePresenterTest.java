@@ -1,88 +1,188 @@
 package me.syncify.unittestandroid.keynotes;
 
-import org.junit.Assert;
+import android.os.Build;
+import android.os.Handler;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.android.controller.ActivityController;
+import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowToast;
 
-import java.util.List;
+import java.util.Random;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import me.syncify.unittestandroid.BuildConfig;
+import me.syncify.unittestandroid.R;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by adarshpandey on 9/12/17.
  */
+@Config(constants = BuildConfig.class, sdk = Build.VERSION_CODES.LOLLIPOP_MR1,
+        application = UnitTestAndroidApplication.class)
+@RunWith(RobolectricTestRunner.class)
 public class AddKeyNotePresenterTest {
 
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    @Mock
-    public AddKeyNoteProtocol.View view;
-
-    @Mock
-    public KeyNoteAPI keyNoteAPI;
-
-    AddKeyNoteProtocol.Presenter presenter;
+    private ActivityController<AddNoteActivity> controller;
+    private AddNoteActivity activity;
 
     @Before
     public void setup() {
-        presenter = new AddKeyNotePresenter(view, keyNoteAPI);
+        controller = Robolectric.buildActivity(AddNoteActivity.class);
+
+        activity = controller
+                .create()
+                .start()
+                .resume()
+                .visible()
+                .get();
+    }
+
+    @After
+    public void tearDown() {
+        UnitTestAndroidApplication.getDataStore().clearNotes();
+
+        // Obliterate activity
+        controller
+                .pause()
+                .stop()
+                .destroy();
+    }
+
+    @Test
+    public void testInvalidAddKeyNote() {
+        // Trying to add invalid note
+        Button button = (Button) activity.findViewById(R.id.button_add_note);
+        button.performClick();
+
+        View overlayLayout = activity.findViewById(R.id.overlay_layout);
+        TextView overlayText = (TextView) activity.findViewById(R.id.overlay_text);
+
+        assertTrue("Loader Not visible", overlayLayout.getVisibility() == View.VISIBLE);
+        assertTrue("Not showing Error in fail case", overlayText.getText().equals(activity.getString(R.string.cannot_add_note)));
+        ;
+
+        (new Handler()).postDelayed(() -> {
+            assertTrue("Loader did not remove", overlayLayout.getVisibility() == View.INVISIBLE);
+        }, 3000);
+    }
+
+    @Test
+    public void testValidAddKeyNote() {
+        // Trying to add valid note
+        EditText titleEditText = (EditText) activity.findViewById(R.id.edittext_title);
+        titleEditText.setText(String.valueOf(System.currentTimeMillis()));
+
+        Button button = (Button) activity.findViewById(R.id.button_add_note);
+        button.performClick();
+
+        View overlayLayout = activity.findViewById(R.id.overlay_layout);
+        TextView overlayText = (TextView) activity.findViewById(R.id.overlay_text);
+
+        assertTrue("Loader Not visible", overlayLayout.getVisibility() == View.VISIBLE);
+        assertTrue("Not showing Success in success case", overlayText.getText().equals(activity.getString(R.string.successfully_added_note)));
+
+        (new Handler()).postDelayed(() -> {
+            assertTrue("Loader did not remove", overlayLayout.getVisibility() == View.INVISIBLE);
+        }, 3000);
+    }
+
+    @Test
+    public void testSameNoteAddedTwice() {
+        EditText titleEditText = (EditText) activity.findViewById(R.id.edittext_title);
+        titleEditText.setText(String.valueOf(System.currentTimeMillis()));
+
+        Button button = (Button) activity.findViewById(R.id.button_add_note);
+        button.performClick();
+
+        // Adding the same note again
+        button.performClick();
+
+        View overlayLayout = activity.findViewById(R.id.overlay_layout);
+        TextView overlayText = (TextView) activity.findViewById(R.id.overlay_text);
+
+        assertTrue("Loader Not visible", overlayLayout.getVisibility() == View.VISIBLE);
+        assertTrue("Not showing Error in fail case", overlayText.getText().equals(activity.getString(R.string.cannot_add_note)));
+        ;
+
+        (new Handler()).postDelayed(() -> {
+            assertTrue("Loader did not remove", overlayLayout.getVisibility() == View.INVISIBLE);
+        }, 3000);
+    }
+
+    @Test
+    public void testGetNotesWithoutAdding() {
+        Button button = (Button) activity.findViewById(R.id.button_get_notes);
+        button.performClick();
+
+        View overlayLayout = activity.findViewById(R.id.overlay_layout);
+
+        assertTrue("Loader Not visible", overlayLayout.getVisibility() == View.VISIBLE);
+        assertTrue("Getting Notes without adding", activity.recyclerAdapter.getItemCount() == 0);
+
+        (new Handler()).postDelayed(() -> {
+            assertTrue("Loader did not remove", overlayLayout.getVisibility() == View.INVISIBLE);
+        }, 3000);
     }
 
 
     @Test
-    public void testAddKeyNotesSuccess() {
-        KeyNote keyNote = new KeyNote();
+    public void testGetNotesWithNotesAdded() {
+        EditText titleEditText = (EditText) activity.findViewById(R.id.edittext_title);
+        Button button = (Button) activity.findViewById(R.id.button_add_note);
 
-        // Mock success
-        when(((AddKeyNotePresenter) presenter).handleAddNote(keyNote)).thenReturn(true);
+        int count = 1 + new Random().nextInt(10);
 
-        presenter.addNote(keyNote);
+        for (int i = 0; i < count; i++) {
+            titleEditText.setText(String.valueOf(System.currentTimeMillis() + new Random().nextInt()));
+            button.performClick();
+        }
 
-        verify(view).showLoader();
-        verify(keyNoteAPI).addKeyNote(keyNote);
-        verify(view).hideLoader();
-        verify(view).showSuccess();
+        Button buttonGetNotes = (Button) activity.findViewById(R.id.button_get_notes);
+        buttonGetNotes.performClick();
+
+        View overlayLayout = activity.findViewById(R.id.overlay_layout);
+
+        assertTrue("Loader Not visible", overlayLayout.getVisibility() == View.VISIBLE);
+        assertTrue("Getting Notes without adding", activity.recyclerView.getChildCount() == count);
+
+        (new Handler()).postDelayed(() -> {
+            assertTrue("Loader did not remove", overlayLayout.getVisibility() == View.INVISIBLE);
+        }, 3000);
     }
 
     @Test
-    public void testAddKeyNotesFailure() {
-        KeyNote keyNote = new KeyNote();
+    public void testNotesClicksAfterAdd() {
+        EditText titleEditText = (EditText) activity.findViewById(R.id.edittext_title);
+        Button button = (Button) activity.findViewById(R.id.button_add_note);
 
-        // Mock Trump's presidency
-        when(((AddKeyNotePresenter) presenter).handleAddNote(keyNote)).thenReturn(false);
+        int count = 1 + new Random().nextInt(10);
+        String[] strings = new String[count];
 
-        presenter.addNote(keyNote);
+        for (int i = 0; i < count; i++) {
+            strings[i] = String.valueOf(System.currentTimeMillis() + new Random().nextInt());
+            titleEditText.setText(strings[i]);
+            button.performClick();
+        }
 
-        verify(view).showLoader();
-        verify(keyNoteAPI).addKeyNote(keyNote);
-        verify(view).hideLoader();
-        verify(view).showError();
-    }
+        Button buttonGetNotes = (Button) activity.findViewById(R.id.button_get_notes);
+        buttonGetNotes.performClick();
 
-    @Test
-    public void testShowAllNotes() {
-        presenter.getAllNotes();
+        int randomInt = new Random().nextInt(count);
+        activity.recyclerView.getChildAt(randomInt).performClick();
 
-        verify(view).showLoader();
-        verify(keyNoteAPI).getAllKeyNotes();
-        verify(view).hideLoader();
-    }
-
-    @Test
-    public void testShowAllNotesCount() {
-        int count = 10;
-        List<KeyNote> list1 = presenter.getAllNotes(count);
-        verify(view).showLoader();
-        verify(keyNoteAPI).getAllKeyNotes();
-        verify(view).hideLoader();
-
-        Assert.assertTrue(list1.size() == count);
+        assertThat("Toast not visible", ShadowToast.getTextOfLatestToast(), equalTo("Title: " + strings[randomInt]));
     }
 
 }
