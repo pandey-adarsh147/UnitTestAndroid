@@ -1,7 +1,9 @@
 package me.syncify.unittestandroid.keynotes;
 
 import android.os.Build;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.TextView;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -54,6 +56,30 @@ public class AddKeyNoteUITest {
                 View.GONE, activity.findViewById(R.id.recycler_notes).getVisibility());
         Assert.assertEquals("Empty text should be visible",
                 View.VISIBLE, activity.findViewById(R.id.empty_text).getVisibility());
+    }
+
+    @Test
+    public void test_NoteListUIForDataCount() {
+        List<KeyNote> keyNoteList = getKeyNoteList();
+        activity.showNoteList(keyNoteList);
+
+        RecyclerView noteListRecycler = (RecyclerView) activity.findViewById(R.id.recycler_notes);
+        Assert.assertEquals("Note recycler should have 6 items",
+                6, noteListRecycler.getAdapter().getItemCount());
+    }
+
+    @Test
+    public void test_NoteListUIForFirstListData() {
+        List<KeyNote> keyNoteList = getKeyNoteList();
+        activity.showNoteList(keyNoteList);
+
+        RecyclerView noteListRecycler = (RecyclerView) activity.findViewById(R.id.recycler_notes);
+
+        RecyclerView.ViewHolder itemViewHolder = noteListRecycler.
+                findViewHolderForAdapterPosition(0);
+        TextView keyNoteTitle = (TextView) itemViewHolder.itemView.findViewById(R.id.itemName);
+        Assert.assertEquals("First recycler item title should be Key Note 1",
+                "Key Note 1", keyNoteTitle.getText().toString());
     }
 
     private List<KeyNote> getKeyNoteList() {

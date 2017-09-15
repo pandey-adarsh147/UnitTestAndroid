@@ -36,6 +36,7 @@ public class AddNoteActivity extends AppCompatActivity implements AddKeyNoteProt
         noteListRecycler = (RecyclerView) findViewById(R.id.recycler_notes);
         noteListRecycler.setLayoutManager(new LinearLayoutManager(this));
         noteRecyclerAdapter = new NoteRecyclerAdapter(this);
+        noteListRecycler.setAdapter(noteRecyclerAdapter);
     }
 
     @Override
